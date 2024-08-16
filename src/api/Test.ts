@@ -17,3 +17,19 @@ export const testGetUser = async (): Promise<ApiResponse<any>> => {
     return handleError(error)
   }
 }
+
+export const getListContactsFriend = async (): Promise<ApiResponse<any>> => {
+  try {
+    const result = await request().get(APIs.apiGetListContactsFriend)
+    const { status, data, code, message, contacts } = result.data
+    return {
+      status,
+      data,
+      code,
+      message,
+      contacts
+    }
+  } catch (error) {
+    return handleError(error)
+  }
+}

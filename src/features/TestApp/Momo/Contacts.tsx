@@ -1,27 +1,22 @@
 import { FlashList } from '@shopify/flash-list'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
+import { getListContactsFriend } from 'src/api/Test'
 import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
-import { Text } from 'src/components/Text'
-import { IDataContact, listContact } from 'src/constants/defines'
-import ItemContact from './ItemContact'
 import CustomHeaderMomo from 'src/components/DefaultActionBar/CustomHeaderMomo'
+import { useLoading } from 'src/components/LoadingPortal'
+import { Text } from 'src/components/Text'
+import { IDataContact } from 'src/constants/defines'
+import ItemContact from './ItemContact'
 
 const Contacts = () => {
+  const { showLoading, hideLoading } = useLoading()
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
+  const [listFriendContact, setListFriendContact] = useState<IDataContact[]>([])
 
   const handleLikeFriend = useCallback((phoneNumber: string) => {
     console.log('handleLikeFriend', phoneNumber)
   }, [])
-
-  const renderItem = ({ item }: { item: IDataContact }) => {
-    return <ItemContact {...item} containerStyle={{ marginTop: 16 }} onPressIconHeart={handleLikeFriend} />
-  }
-  const renderListBank = () => (
-    <View>
-      <Text>this is list bank</Text>
-    </View>
-  )
 
   const tabStyles = [
     {
@@ -39,6 +34,30 @@ const Contacts = () => {
     { text: 'Bạn bè', color: activeTabFriends ? '#cc598d' : '#7F7F7F' },
     { text: 'Tài khoản ngân hàng', color: !activeTabFriends ? '#cc598d' : '#7F7F7F' }
   ]
+
+  const handleGetListContactFriend = async () => {
+    showLoading()
+    const res = await getListContactsFriend()
+    if (Array.isArray(res.contacts) && res.contacts?.length > 0) {
+      setListFriendContact(res.contacts)
+    } else {
+      setListFriendContact([])
+    }
+    hideLoading()
+  }
+
+  useEffect(() => {
+    handleGetListContactFriend()
+  }, [])
+
+  const renderItem = ({ item }: { item: IDataContact }) => {
+    return <ItemContact {...item} containerStyle={{ marginTop: 16 }} onPressIconHeart={handleLikeFriend} />
+  }
+  const renderListBank = () => (
+    <View>
+      <Text>this is list bank</Text>
+    </View>
+  )
 
   return (
     <>
@@ -64,7 +83,7 @@ const Contacts = () => {
           <View style={{ flex: 1, marginTop: 16 }}>
             <FlashList
               estimatedItemSize={1000}
-              data={listContact}
+              data={listFriendContact}
               renderItem={renderItem}
               showsVerticalScrollIndicator={false}
             />
