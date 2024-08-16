@@ -22,6 +22,13 @@ export interface IDataContact {
   phoneNumber: string
 }
 
+export interface IDataContactSql {
+  id: number
+  first_name: string
+  last_name: string
+  phone_number: string
+}
+
 export const listContact: IDataContact[] = [
   {
     first_name: 'Minh Tuấn',

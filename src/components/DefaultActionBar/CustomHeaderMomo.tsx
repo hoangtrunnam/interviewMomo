@@ -8,9 +8,11 @@ import { TouchRippleSingle } from '../Button/TouchRippleSingle'
 import { Text } from '../Text'
 interface IProps {
   title?: string
+  onChangeText?: (value: string) => void
 }
 
 const CustomHeaderMomo = React.forwardRef<any, IProps>((props: IProps, ref) => {
+  const { onChangeText = () => {} } = props
   const [value, setValue] = useState<string>('')
   const handleCancel = () => {
     setValue('')
@@ -54,7 +56,10 @@ const CustomHeaderMomo = React.forwardRef<any, IProps>((props: IProps, ref) => {
               paddingHorizontal: 16
             }}
             value={value}
-            onChangeText={setValue}
+            onChangeText={e => {
+              setValue(e)
+              onChangeText && onChangeText(e)
+            }}
             placeholder="Nhập tên, số điện thoại hoặc số tài khoản"
           />
         </View>
@@ -70,7 +75,7 @@ const CustomHeaderMomo = React.forwardRef<any, IProps>((props: IProps, ref) => {
   )
 })
 
-export default CustomHeaderMomo
+export default React.memo(CustomHeaderMomo)
 
 const styles = StyleSheet.create({
   container: {

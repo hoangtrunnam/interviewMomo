@@ -6,14 +6,14 @@ import ExpoImage from 'src/components/Image'
 import { Text } from 'src/components/Text'
 
 interface IPropsItemContact {
-  first_name: string
-  last_name: string
+  firstName: string
+  lastName: string
   phoneNumber: string
   containerStyle?: ViewStyle
   onPressIconHeart: (phoneNumber: string) => void
 }
 const ItemContact = (props: IPropsItemContact) => {
-  const { first_name = '', last_name = '', phoneNumber = '', containerStyle, onPressIconHeart = () => {} } = props
+  const { firstName = '', lastName = '', phoneNumber = '', containerStyle, onPressIconHeart = () => {} } = props
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -25,7 +25,7 @@ const ItemContact = (props: IPropsItemContact) => {
         </View>
         <View style={{ paddingLeft: 16 }}>
           <Text size={18} bold>
-            {last_name} {first_name}
+            {lastName} {firstName}
           </Text>
           <Text size={14} color="#8F9294">
             {phoneNumber}

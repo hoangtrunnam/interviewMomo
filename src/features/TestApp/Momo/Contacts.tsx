@@ -6,17 +6,27 @@ import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
 import CustomHeaderMomo from 'src/components/DefaultActionBar/CustomHeaderMomo'
 import { useLoading } from 'src/components/LoadingPortal'
 import { Text } from 'src/components/Text'
-import { IDataContact } from 'src/constants/defines'
+import { IDataContactSql } from 'src/constants/defines'
 import ItemContact from './ItemContact'
+import Fuse from 'fuse.js'
+import { Button } from 'src/components/Button'
+import { clearDatabase, getAllContacts, saveContactListToDatabase, setupDatabase } from 'src/components/Database'
+const fuseOptions = {
+  keys: ['first_name', 'last_name', 'phone_number'],
+  shouldSort: true,
+  threshold: 0.3,
+  location: 0,
+  distance: 100,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  useExtendedSearch: true
+}
 
 const Contacts = () => {
   const { showLoading, hideLoading } = useLoading()
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
-  const [listFriendContact, setListFriendContact] = useState<IDataContact[]>([])
-
-  const handleLikeFriend = useCallback((phoneNumber: string) => {
-    console.log('handleLikeFriend', phoneNumber)
-  }, [])
+  const [listFriendContact, setListFriendContact] = useState<IDataContactSql[]>([])
+  const fuse = new Fuse(listFriendContact, fuseOptions)
 
   const tabStyles = [
     {
@@ -34,12 +44,42 @@ const Contacts = () => {
     { text: 'Bạn bè', color: activeTabFriends ? '#cc598d' : '#7F7F7F' },
     { text: 'Tài khoản ngân hàng', color: !activeTabFriends ? '#cc598d' : '#7F7F7F' }
   ]
+  const handleLikeFriend = useCallback((phoneNumber: string) => {
+    console.log('handleLikeFriend', phoneNumber)
+  }, [])
+
+  const handleChangeText = useCallback(
+    async (e: string) => {
+      const db = await setupDatabase()
+      if (e.trim() !== '') {
+        const result = fuse.search(e).map(({ item }) => item)
+        console.log('🚀 ~ handleChangeText ~ result:', result)
+        setListFriendContact(result)
+      } else {
+        const listContacts = await getAllContacts(db)
+        setListFriendContact(listContacts)
+      }
+    },
+    [fuse]
+  )
+
+  const handleBankPress = async () => {
+    setActiveTabFriends(false)
+    const db = await setupDatabase()
+    if (db) {
+      const res = await getAllContacts(db)
+      console.log('🚀 ~ onPress={ ~ res:', res)
+    }
+  }
 
   const handleGetListContactFriend = async () => {
     showLoading()
     const res = await getListContactsFriend()
-    if (Array.isArray(res.contacts) && res.contacts?.length > 0) {
-      setListFriendContact(res.contacts)
+    const db = await setupDatabase()
+    if (Array.isArray(res.contacts) && res.contacts?.length > 0 && db) {
+      await saveContactListToDatabase(db, res.contacts)
+      const listContacts = await getAllContacts(db)
+      setListFriendContact(listContacts)
     } else {
       setListFriendContact([])
     }
@@ -50,18 +90,37 @@ const Contacts = () => {
     handleGetListContactFriend()
   }, [])
 
-  const renderItem = ({ item }: { item: IDataContact }) => {
-    return <ItemContact {...item} containerStyle={{ marginTop: 16 }} onPressIconHeart={handleLikeFriend} />
+  const renderItem = ({ item }: { item: IDataContactSql }) => {
+    const { first_name, last_name, phone_number } = item
+    return (
+      <ItemContact
+        firstName={first_name}
+        lastName={last_name}
+        phoneNumber={phone_number}
+        containerStyle={{ marginTop: 16 }}
+        onPressIconHeart={handleLikeFriend}
+      />
+    )
   }
   const renderListBank = () => (
     <View>
-      <Text>this is list bank</Text>
+      <Button
+        onPress={async () => {
+          const db = await setupDatabase()
+          if (db) {
+            clearDatabase(db)
+          }
+        }}>
+        <Text color="#fff" textAlign="center">
+          Delete data
+        </Text>
+      </Button>
     </View>
   )
 
   return (
     <>
-      <CustomHeaderMomo />
+      <CustomHeaderMomo onChangeText={handleChangeText} />
       <View style={{ flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' }}>
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
           <TouchRippleSingle onPress={() => setActiveTabFriends(true)}>
@@ -71,7 +130,7 @@ const Contacts = () => {
               </Text>
             </View>
           </TouchRippleSingle>
-          <TouchRippleSingle onPress={() => setActiveTabFriends(false)}>
+          <TouchRippleSingle onPress={handleBankPress}>
             <View style={[styles.containerTopTab, tabStyles[1]]}>
               <Text size={16} bold color={tabTexts[1].color}>
                 {tabTexts[1].text}
