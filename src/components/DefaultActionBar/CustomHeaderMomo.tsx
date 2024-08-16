@@ -38,6 +38,8 @@ const CustomHeaderMomo = React.forwardRef<any, IProps>((props: IProps, ref) => {
               setValue(e)
               onChangeText && onChangeText(e)
             }}
+            autoCorrect={false}
+            autoComplete="off"
             placeholder="Nhập tên, số điện thoại hoặc số tài khoản"
           />
         </View>

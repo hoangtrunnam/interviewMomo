@@ -12,23 +12,31 @@ import { useLoading } from 'src/components/LoadingPortal'
 import { Text } from 'src/components/Text'
 import { IDataContactSql } from 'src/constants/defines'
 import ItemContact from './ItemContact'
+import { nonAccentVietnamese } from 'src/commons/validator'
 
 const fuseOptions = {
   keys: ['first_name', 'last_name', 'phone_number'],
+  isCaseSensitive: false,
+  includeScore: false,
   shouldSort: true,
-  threshold: 0.3,
+  includeMatches: false,
+  findAllMatches: false,
+  minMatchCharLength: 1,
   location: 0,
+  threshold: 0.6,
   distance: 100,
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-  useExtendedSearch: true
+  useExtendedSearch: false,
+  ignoreLocation: false,
+  ignoreFieldNorm: false,
+  fieldNormWeight: 1
 }
 
 const Contacts = () => {
   const { showLoading, hideLoading } = useLoading()
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
   const [listFriendContact, setListFriendContact] = useState<IDataContactSql[]>([])
-  const fuse = new Fuse(listFriendContact, fuseOptions)
+  const [listFriendSearch, setListFriendSearch] = useState<IDataContactSql[]>([])
+  const fuse = new Fuse(listFriendSearch, fuseOptions)
 
   const tabStyles = [
     {
@@ -53,10 +61,10 @@ const Contacts = () => {
 
   const handleChangeText = useCallback(
     async (e: string) => {
+      const simText = nonAccentVietnamese(e)
       const db = await setupDatabase()
-      if (e.trim() !== '') {
-        const result = fuse.search(e).map(({ item }) => item)
-        console.log('🚀 ~ handleChangeText ~ result:', result)
+      if (simText.trim() !== '') {
+        const result = fuse.search(simText).map(({ item }) => item)
         setListFriendContact(result)
       } else {
         const listContacts = await getAllContacts(db)
@@ -83,6 +91,7 @@ const Contacts = () => {
       await saveContactListToDatabase(db, res.contacts)
       const listContacts = await getAllContacts(db)
       setListFriendContact(listContacts)
+      setListFriendSearch(listContacts)
     } else {
       setListFriendContact([])
     }
