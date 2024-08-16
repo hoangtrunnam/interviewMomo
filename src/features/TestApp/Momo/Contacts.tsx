@@ -1,16 +1,18 @@
 import { FlashList } from '@shopify/flash-list'
+import Fuse from 'fuse.js'
 import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getListContactsFriend } from 'src/api/Test'
+import { scale, styleWithScale } from 'src/commons/dimension'
+import { Button } from 'src/components/Button'
 import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
+import { clearDatabase, getAllContacts, saveContactListToDatabase, setupDatabase } from 'src/components/Database'
 import CustomHeaderMomo from 'src/components/DefaultActionBar/CustomHeaderMomo'
 import { useLoading } from 'src/components/LoadingPortal'
 import { Text } from 'src/components/Text'
 import { IDataContactSql } from 'src/constants/defines'
 import ItemContact from './ItemContact'
-import Fuse from 'fuse.js'
-import { Button } from 'src/components/Button'
-import { clearDatabase, getAllContacts, saveContactListToDatabase, setupDatabase } from 'src/components/Database'
+
 const fuseOptions = {
   keys: ['first_name', 'last_name', 'phone_number'],
   shouldSort: true,
@@ -36,7 +38,7 @@ const Contacts = () => {
     {
       borderWidth: !activeTabFriends ? 1 : 0,
       backgroundColor: !activeTabFriends ? '#fff' : '#FAFAFA',
-      marginLeft: 16
+      marginLeft: scale(16)
     }
   ]
 
@@ -44,6 +46,7 @@ const Contacts = () => {
     { text: 'Bạn bè', color: activeTabFriends ? '#cc598d' : '#7F7F7F' },
     { text: 'Tài khoản ngân hàng', color: !activeTabFriends ? '#cc598d' : '#7F7F7F' }
   ]
+
   const handleLikeFriend = useCallback((phoneNumber: string) => {
     console.log('handleLikeFriend', phoneNumber)
   }, [])
@@ -97,11 +100,12 @@ const Contacts = () => {
         firstName={first_name}
         lastName={last_name}
         phoneNumber={phone_number}
-        containerStyle={{ marginTop: 16 }}
+        containerStyle={styleWithScale(styles.itemContactContainer)}
         onPressIconHeart={handleLikeFriend}
       />
     )
   }
+
   const renderListBank = () => (
     <View>
       <Button
@@ -121,17 +125,17 @@ const Contacts = () => {
   return (
     <>
       <CustomHeaderMomo onChangeText={handleChangeText} />
-      <View style={{ flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' }}>
-        <View style={{ flexDirection: 'row', marginTop: 8 }}>
+      <View style={styleWithScale(styles.container)}>
+        <View style={styleWithScale(styles.tabContainer)}>
           <TouchRippleSingle onPress={() => setActiveTabFriends(true)}>
-            <View style={[styles.containerTopTab, tabStyles[0]]}>
+            <View style={[styleWithScale(styles.containerTopTab), tabStyles[0]]}>
               <Text size={16} bold color={tabTexts[0].color}>
                 {tabTexts[0].text}
               </Text>
             </View>
           </TouchRippleSingle>
           <TouchRippleSingle onPress={handleBankPress}>
-            <View style={[styles.containerTopTab, tabStyles[1]]}>
+            <View style={[styleWithScale(styles.containerTopTab), tabStyles[1]]}>
               <Text size={16} bold color={tabTexts[1].color}>
                 {tabTexts[1].text}
               </Text>
@@ -139,7 +143,7 @@ const Contacts = () => {
           </TouchRippleSingle>
         </View>
         {activeTabFriends ? (
-          <View style={{ flex: 1, marginTop: 16 }}>
+          <View style={styleWithScale(styles.listContainer)}>
             <FlashList
               estimatedItemSize={1000}
               data={listFriendContact}
@@ -158,11 +162,27 @@ const Contacts = () => {
 export default Contacts
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff'
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 8
+  },
   containerTopTab: {
     borderWidth: 1,
     borderColor: 'red',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20
+  },
+  listContainer: {
+    flex: 1,
+    marginTop: 16
+  },
+  itemContactContainer: {
+    marginTop: 16
   }
 })
