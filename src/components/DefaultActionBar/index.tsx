@@ -1,11 +1,13 @@
+/* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
+import { SafeAreaView, StatusBar, StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import HeaderTitle from './HeaderTitle'
 import { Divide } from '../Divide'
 import IconClose from 'src/assets/iconsSvg/IconClose'
 import ArrowLeft from 'src/assets/iconsSvg/ArrowLeft'
 import { DIMENSION } from 'src/commons/dimension'
+import { Text } from '../Text'
 
 interface IProps {
   title?: string

@@ -38,9 +38,9 @@ const Home = () => {
       <View>
         <TouchRippleSingle
           onPress={() => {
-            navigation.navigate(routes.DetailCalender)
+            navigation.navigate(routes.Contacts)
           }}>
-          <Text>press to open DetailCalender</Text>
+          <Text>press to open Contacts</Text>
         </TouchRippleSingle>
       </View>
       <ExpoImage

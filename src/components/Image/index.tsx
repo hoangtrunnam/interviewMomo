@@ -13,7 +13,7 @@ import { IMAGES } from 'src/assets/images'
 
 export type TImage = ImageProps &
   React.PropsWithChildren & {
-    source: string
+    source: ImageSource | string | number | ImageSource[] | string[] | null
     style?: StyleProp<ImageStyle>
     contentFit?: ImageContentFit
     transition?: number | ImageTransition | null | undefined
@@ -42,16 +42,16 @@ const ExpoImage = (props: TImage) => {
     }
   }
 
-  const clearCache = async () => {
-    const res = await Image.clearMemoryCache()
-    console.log('🚀 ~ clearCache ~ res:', res)
-  }
+  // const clearCache = async () => {
+  //   const res = await Image.clearMemoryCache()
+  //   console.log('🚀 ~ clearCache ~ res:', res)
+  // }
 
-  useEffect(() => {
-    return () => {
-      clearCache()
-    }
-  }, [])
+  // useEffect(() => {
+  //   return () => {
+  //     clearCache()
+  //   }
+  // }, [])
 
   return (
     <Image

@@ -1,5 +1,5 @@
 {
-  "name": "baseexpoapp",
+  "name": "interviewMomo",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
@@ -36,6 +36,8 @@
     "expo-localization": "~15.0.3",
     "expo-secure-store": "~13.0.2",
     "expo-splash-screen": "~0.27.5",
+    "@shopify/flash-list": "1.6.4",
+    "expo-dev-client": "~4.0.23",
     "expo-status-bar": "~1.12.1",
     "i18n-js": "3.9.2",
     "moment": "^2.30.1",

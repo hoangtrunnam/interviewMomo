@@ -21,6 +21,7 @@ export type MainNavigationParamList = {
   UserProfile: undefined
   Dashboard: undefined
   DetailCalender: undefined
+  Contacts: undefined
 }
 
 export type RoutesType = BottomTabNavigationParamList & MainNavigationParamList

@@ -23,20 +23,21 @@ const Login = ({ navigation }: ILogin) => {
   const [password, setPassword] = useState<string>('123456')
 
   const handleLogin = async () => {
-    showLoading()
-    setMessage('Đang đăng nhập, vui lòng chờ')
-    const res = await postLogin(email, password)
-    if (!!res.token.token) {
-      setDataLogin(res as any)
-      await SecureStore.setItemAsync(TypeToken.TOKEN, res.token.token)
-      navigation.navigate(routes.DrawerTab, {
-        screen: routesDrawer.BottomTab,
-        params: {
-          screen: routesBottomTab.Home
-        }
-      })
-    }
-    hideLoading()
+    // showLoading()
+    // setMessage('Đang đăng nhập, vui lòng chờ')
+    // const res = await postLogin(email, password)
+    navigation.navigate(routes.Contacts)
+    // if (!!res.token.token) {
+    //   setDataLogin(res as any)
+    //   await SecureStore.setItemAsync(TypeToken.TOKEN, res.token.token)
+    //   navigation.navigate(routes.DrawerTab, {
+    //     screen: routesDrawer.BottomTab,
+    //     params: {
+    //       screen: routesBottomTab.Home
+    //     }
+    //   })
+    // }
+    // hideLoading()
   }
   return (
     <>

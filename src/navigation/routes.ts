@@ -16,7 +16,8 @@ export const routes: Entries<RoutesType> = {
   UserProfile: 'UserProfile',
   SignUp: 'SignUp',
   Dashboard: 'Dashboard',
-  DetailCalender: 'DetailCalender'
+  DetailCalender: 'DetailCalender',
+  Contacts: 'Contacts'
 }
 
 export const routesBottomTab: Entries<BottomTabNavigationParamList> = {
