@@ -13,6 +13,8 @@ export const setupDatabase = async () => {
       phone_number TEXT NOT NULL,
       is_like INTEGER DEFAULT 0
     );
+      CREATE INDEX IF NOT EXISTS idx_phone_number ON contacts (phone_number);
+      CREATE INDEX IF NOT EXISTS idx_first_name ON contacts (first_name);
   `)
 
     return db
