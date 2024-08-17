@@ -40,7 +40,7 @@ const CustomHeaderMomo = React.forwardRef<any, IProps>((props: IProps, ref) => {
             }}
             autoCorrect={false}
             autoComplete="off"
-            placeholder="Nhập tên, số điện thoại hoặc số tài khoản"
+            placeholder="Nhập tên, số điện thoại, số tài khoản"
           />
         </View>
         <TouchRippleSingle onPress={handleCancel}>
@@ -62,10 +62,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: 110
+    height: DIMENSION.isIos ? 110 : 90
   },
   container: {
-    marginTop: DIMENSION.topPadding + 30,
+    marginTop: DIMENSION.isIos ? DIMENSION.topPadding + 30 : 10,
     flexDirection: 'row',
     height: 100,
     alignItems: 'center',

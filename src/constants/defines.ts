@@ -32,7 +32,7 @@ export interface IDataContactSql {
 }
 
 export const fuseOptionsSearch = {
-  keys: ['first_name', 'last_name', 'phone_number'],
+  keys: ['first_name', 'phone_number'],
   isCaseSensitive: false,
   includeScore: false,
   shouldSort: true,
