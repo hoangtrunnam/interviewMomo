@@ -10,12 +10,20 @@ interface IPropsItemContact {
   firstName: string
   lastName: string
   phoneNumber: string
+  isLike: number
   containerStyle?: ViewStyle
   onPressIconHeart: (phoneNumber: string) => void
 }
 
 const ItemContact = (props: IPropsItemContact) => {
-  const { firstName = '', lastName = '', phoneNumber = '', containerStyle, onPressIconHeart = () => {} } = props
+  const {
+    firstName = '',
+    lastName = '',
+    phoneNumber = '',
+    containerStyle,
+    onPressIconHeart = () => {},
+    isLike = 0
+  } = props
   return (
     <View style={[styleWithScale(styles.container), containerStyle]}>
       <View style={styleWithScale(styles.contactInfo)}>
@@ -36,7 +44,7 @@ const ItemContact = (props: IPropsItemContact) => {
       </View>
       <TouchRippleSingle onPress={() => onPressIconHeart(phoneNumber)}>
         <View>
-          <Ionicons name="heart-outline" size={32} color={'#8F9294'} />
+          <Ionicons name={isLike ? 'heart' : 'heart-outline'} size={32} color={isLike ? '#cc598d' : '#8F9294'} />
         </View>
       </TouchRippleSingle>
     </View>

@@ -1,42 +1,33 @@
 import { FlashList } from '@shopify/flash-list'
+import { SQLiteDatabase } from 'expo-sqlite'
 import Fuse from 'fuse.js'
 import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getListContactsFriend } from 'src/api/Test'
 import { scale, styleWithScale } from 'src/commons/dimension'
+import { nonAccentVietnamese } from 'src/commons/validator'
 import { Button } from 'src/components/Button'
 import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
-import { clearDatabase, getAllContacts, saveContactListToDatabase, setupDatabase } from 'src/components/Database'
+import {
+  clearDatabase,
+  getAllContacts,
+  saveContactListToDatabase,
+  setupDatabase,
+  toggleLikeStatus
+} from 'src/components/Database'
 import CustomHeaderMomo from 'src/components/DefaultActionBar/CustomHeaderMomo'
 import { useLoading } from 'src/components/LoadingPortal'
 import { Text } from 'src/components/Text'
-import { IDataContactSql } from 'src/constants/defines'
+import { fuseOptionsSearch, IDataContactSql } from 'src/constants/defines'
 import ItemContact from './ItemContact'
-import { nonAccentVietnamese } from 'src/commons/validator'
-
-const fuseOptions = {
-  keys: ['first_name', 'last_name', 'phone_number'],
-  isCaseSensitive: false,
-  includeScore: false,
-  shouldSort: true,
-  includeMatches: false,
-  findAllMatches: false,
-  minMatchCharLength: 1,
-  location: 0,
-  threshold: 0.6,
-  distance: 100,
-  useExtendedSearch: false,
-  ignoreLocation: false,
-  ignoreFieldNorm: false,
-  fieldNormWeight: 1
-}
 
 const Contacts = () => {
   const { showLoading, hideLoading } = useLoading()
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
   const [listFriendContact, setListFriendContact] = useState<IDataContactSql[]>([])
   const [listFriendSearch, setListFriendSearch] = useState<IDataContactSql[]>([])
-  const fuse = new Fuse(listFriendSearch, fuseOptions)
+  const [db, setDb] = useState<SQLiteDatabase | undefined>(undefined)
+  const fuse = new Fuse(listFriendSearch, fuseOptionsSearch)
 
   const tabStyles = [
     {
@@ -55,57 +46,86 @@ const Contacts = () => {
     { text: 'Tài khoản ngân hàng', color: !activeTabFriends ? '#cc598d' : '#7F7F7F' }
   ]
 
-  const handleLikeFriend = useCallback((phoneNumber: string) => {
-    console.log('handleLikeFriend', phoneNumber)
-  }, [])
+  const handleLikeFriend = useCallback(
+    async (phoneNumber: string) => {
+      try {
+        if (!db) return
+        const result = await toggleLikeStatus(db, phoneNumber)
+
+        if (result) {
+          // logic bấm like trong lúc search không bị render lại list
+          const updatedContacts = await getAllContacts(db)
+          const arrParentsMap = new Map(updatedContacts.map(e => [e.phone_number, e]))
+          const res = listFriendContact.map(e => arrParentsMap.get(e.phone_number) || null)
+          const newData = res.filter(e => e !== null)
+          setListFriendContact(newData)
+          // bất kì hành động like nào thì đề phải update lại data search nếu không nó sẽ search theo data cũ
+          setListFriendSearch(updatedContacts)
+        }
+      } catch (error) {
+        console.log('Error toggling like status:', error)
+      }
+    },
+    [db, listFriendContact]
+  )
 
   const handleChangeText = useCallback(
     async (e: string) => {
       const simText = nonAccentVietnamese(e)
-      const db = await setupDatabase()
+
       if (simText.trim() !== '') {
         const result = fuse.search(simText).map(({ item }) => item)
         setListFriendContact(result)
       } else {
+        if (!db) return
         const listContacts = await getAllContacts(db)
         setListFriendContact(listContacts)
       }
     },
-    [fuse]
+    [db, fuse]
   )
 
   const handleBankPress = async () => {
     setActiveTabFriends(false)
-    const db = await setupDatabase()
-    if (db) {
-      const res = await getAllContacts(db)
-      console.log('🚀 ~ onPress={ ~ res:', res)
-    }
+
+    if (!db) return
+    const res = await getAllContacts(db)
+    console.log('🚀 ~ onPress={ ~ res:', res)
   }
 
-  const handleGetListContactFriend = async () => {
+  const handleGetListContactFriend = useCallback(async () => {
     showLoading()
     const res = await getListContactsFriend()
-    const db = await setupDatabase()
+
     if (Array.isArray(res.contacts) && res.contacts?.length > 0 && db) {
       await saveContactListToDatabase(db, res.contacts)
       const listContacts = await getAllContacts(db)
       setListFriendContact(listContacts)
-      setListFriendSearch(listContacts)
+      setListFriendSearch(listContacts) // data search cho fuse
     } else {
       setListFriendContact([])
     }
     hideLoading()
-  }
+  }, [db])
 
   useEffect(() => {
     handleGetListContactFriend()
+  }, [handleGetListContactFriend])
+
+  useEffect(() => {
+    const initializeDatabase = async () => {
+      const database = await setupDatabase()
+      setDb(database)
+    }
+
+    initializeDatabase()
   }, [])
 
   const renderItem = ({ item }: { item: IDataContactSql }) => {
-    const { first_name, last_name, phone_number } = item
+    const { first_name, last_name, phone_number, is_like } = item
     return (
       <ItemContact
+        isLike={is_like}
         firstName={first_name}
         lastName={last_name}
         phoneNumber={phone_number}
@@ -119,7 +139,6 @@ const Contacts = () => {
     <View>
       <Button
         onPress={async () => {
-          const db = await setupDatabase()
           if (db) {
             clearDatabase(db)
           }

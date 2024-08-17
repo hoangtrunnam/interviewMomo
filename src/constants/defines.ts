@@ -20,6 +20,7 @@ export interface IDataContact {
   first_name: string
   last_name: string
   phoneNumber: string
+  is_like?: number
 }
 
 export interface IDataContactSql {
@@ -27,6 +28,24 @@ export interface IDataContactSql {
   first_name: string
   last_name: string
   phone_number: string
+  is_like: number
+}
+
+export const fuseOptionsSearch = {
+  keys: ['first_name', 'last_name', 'phone_number'],
+  isCaseSensitive: false,
+  includeScore: false,
+  shouldSort: true,
+  includeMatches: false,
+  findAllMatches: false,
+  minMatchCharLength: 1,
+  location: 0,
+  threshold: 0.6,
+  distance: 100,
+  useExtendedSearch: false,
+  ignoreLocation: false,
+  ignoreFieldNorm: false,
+  fieldNormWeight: 1
 }
 
 export const listContact: IDataContact[] = [
