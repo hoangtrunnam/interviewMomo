@@ -41,6 +41,9 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setMessage('Xin vui lòng chờ trong giây lát')
         }, 5 * 1000)
       }
+      hideLoadingTimeout.current = setTimeout(() => {
+        hideLoading()
+      }, 15 * 1000)
     }
   }
 

@@ -90,15 +90,14 @@ const Contacts = () => {
   const handleGetListContactFriend = useCallback(async () => {
     showLoading()
     const res = await getListContactsFriend()
+    if (!db) return
 
-    if (Array.isArray(res.contacts) && res.contacts?.length > 0 && db) {
+    if (Array.isArray(res.contacts) && res.contacts?.length > 0) {
       await saveContactListToDatabase(db, res.contacts)
-      const listContacts = await getAllContacts(db)
-      setListFriendContact(listContacts)
-      setListFriendSearch(listContacts) // data search cho fuse
-    } else {
-      setListFriendContact([])
     }
+    const listContacts = await getAllContacts(db)
+    setListFriendContact(listContacts)
+    setListFriendSearch(listContacts) // data search cho fuse
     hideLoading()
   }, [db])
 
