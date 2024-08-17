@@ -1,20 +1,14 @@
 import { FlashList } from '@shopify/flash-list'
-import { SQLiteDatabase } from 'expo-sqlite'
 import Fuse from 'fuse.js'
 import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getListContactsFriend } from 'src/api/Test'
 import { scale, styleWithScale } from 'src/commons/dimension'
+import useDatabase from 'src/commons/hooks/useDatabase'
 import { nonAccentVietnamese } from 'src/commons/validator'
 import { Button } from 'src/components/Button'
 import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
-import {
-  clearDatabase,
-  getAllContacts,
-  saveContactListToDatabase,
-  setupDatabase,
-  toggleLikeStatus
-} from 'src/components/Database'
+import { clearDatabase, getAllContacts, saveContactListToDatabase, toggleLikeStatus } from 'src/components/Database'
 import CustomHeaderMomo from 'src/components/DefaultActionBar/CustomHeaderMomo'
 import { useLoading } from 'src/components/LoadingPortal'
 import { Text } from 'src/components/Text'
@@ -23,10 +17,10 @@ import ItemContact from './ItemContact'
 
 const Contacts = () => {
   const { showLoading, hideLoading } = useLoading()
+  const { db, loadingDb } = useDatabase()
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
   const [listFriendContact, setListFriendContact] = useState<IDataContactSql[]>([])
   const [listFriendSearch, setListFriendSearch] = useState<IDataContactSql[]>([])
-  const [db, setDb] = useState<SQLiteDatabase | undefined>(undefined)
   const fuse = new Fuse(listFriendSearch, fuseOptionsSearch)
 
   const tabStyles = [
@@ -109,17 +103,10 @@ const Contacts = () => {
   }, [db])
 
   useEffect(() => {
-    handleGetListContactFriend()
-  }, [handleGetListContactFriend])
-
-  useEffect(() => {
-    const initializeDatabase = async () => {
-      const database = await setupDatabase()
-      setDb(database)
+    if (db && !loadingDb) {
+      handleGetListContactFriend()
     }
-
-    initializeDatabase()
-  }, [])
+  }, [db, loadingDb])
 
   const renderItem = ({ item }: { item: IDataContactSql }) => {
     const { first_name, last_name, phone_number, is_like } = item
