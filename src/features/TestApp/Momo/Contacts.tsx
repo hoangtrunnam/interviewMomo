@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native'
 import { getListContactsFriend } from 'src/api/Test'
 import { scale, styleWithScale } from 'src/commons/dimension'
 import useDatabase from 'src/commons/hooks/useDatabase'
+import useDebounce from 'src/commons/hooks/useDebounce'
 import { nonAccentVietnamese } from 'src/commons/validator'
 import { Button } from 'src/components/Button'
 import { TouchRippleSingle } from 'src/components/Button/TouchRippleSingle'
@@ -21,6 +22,8 @@ const Contacts = () => {
   const [activeTabFriends, setActiveTabFriends] = useState<boolean>(true)
   const [listFriendContact, setListFriendContact] = useState<IDataContactSql[]>([])
   const [listFriendSearch, setListFriendSearch] = useState<IDataContactSql[]>([])
+  const [searchText, setSearchText] = useState<string>('')
+  const debouncedSearchText = useDebounce(searchText, 700)
   const fuse = new Fuse(listFriendSearch, fuseOptionsSearch)
 
   const tabStyles = [
@@ -66,6 +69,7 @@ const Contacts = () => {
   const handleChangeText = useCallback(
     async (e: string) => {
       const simText = nonAccentVietnamese(e)
+      console.log('🚀 ~ simText:', simText)
 
       if (simText.trim() !== '') {
         const result = fuse.search(simText).map(({ item }) => item)
@@ -100,6 +104,18 @@ const Contacts = () => {
     setListFriendSearch(listContacts) // data search cho fuse
     hideLoading()
   }, [db])
+
+  useEffect(() => {
+    if (debouncedSearchText.trim() !== '') {
+      handleChangeText(debouncedSearchText)
+    } else {
+      if (!db) return
+      // avoid write async here ^.^
+      getAllContacts(db).then(listContacts => {
+        setListFriendContact(listContacts)
+      })
+    }
+  }, [debouncedSearchText, db])
 
   useEffect(() => {
     if (db && !loadingDb) {
@@ -138,7 +154,7 @@ const Contacts = () => {
 
   return (
     <>
-      <CustomHeaderMomo onChangeText={handleChangeText} />
+      <CustomHeaderMomo onChangeText={setSearchText} />
       <View style={styleWithScale(styles.container)}>
         <View style={styleWithScale(styles.tabContainer)}>
           <TouchRippleSingle onPress={() => setActiveTabFriends(true)}>
