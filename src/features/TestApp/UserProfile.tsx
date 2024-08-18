@@ -1,13 +1,13 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import type { MainStackScreenNavigationProps } from 'src/navigation/types'
+import { StackActions, useNavigation } from '@react-navigation/native'
 // import {routes} from 'src/navigation/routes'
 
-interface ILogin extends MainStackScreenNavigationProps<'UserProfile'> {}
-
-const UserProfile = ({ navigation }: ILogin) => {
+const UserProfile = () => {
+  const navigation = useNavigation()
   const handleLogout = () => {
-    navigation.popToTop()
+    navigation.dispatch(StackActions.popToTop())
   }
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

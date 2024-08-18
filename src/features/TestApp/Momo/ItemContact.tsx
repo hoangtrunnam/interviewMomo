@@ -44,7 +44,12 @@ const ItemContact = (props: IPropsItemContact) => {
       </View>
       <TouchRippleSingle onPress={() => onPressIconHeart(phoneNumber)}>
         <View>
-          <Ionicons name={isLike ? 'heart' : 'heart-outline'} size={32} color={isLike ? '#cc598d' : '#8F9294'} />
+          <Ionicons
+            testID="heart-icon"
+            name={isLike ? 'heart' : 'heart-outline'}
+            size={32}
+            color={isLike ? '#cc598d' : '#8F9294'}
+          />
         </View>
       </TouchRippleSingle>
     </View>

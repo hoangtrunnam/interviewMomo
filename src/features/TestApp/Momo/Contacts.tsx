@@ -122,7 +122,7 @@ const Contacts = () => {
   }
 
   const renderListBank = () => (
-    <View>
+    <View testID="bank-container">
       <Button
         onPress={async () => {
           if (db) {
@@ -157,8 +157,9 @@ const Contacts = () => {
           </TouchRippleSingle>
         </View>
         {activeTabFriends ? (
-          <View style={styleWithScale(styles.listContainer)}>
+          <View style={styleWithScale(styles.listContainer)} testID="flashlist-container">
             <FlashList
+              testID="flashlist"
               estimatedItemSize={1000}
               data={listFriendContact}
               renderItem={renderItem}
