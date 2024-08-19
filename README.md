@@ -25,6 +25,13 @@ The second launch app and later:
 - useCallback, React.Memo
 - scale (multi devices)
 
+## 3. Demo video:
+__**Click here:**__ [Watch the demo video](https://drive.google.com/file/d/1AiltqWhMboMEwAtUKEK0y8H9e0nssBAb/view?usp=sharing)
+
+
+[![click here](https://i.ibb.co/kKjDMm8/IMG-8511.png)](https://drive.google.com/file/d/1AiltqWhMboMEwAtUKEK0y8H9e0nssBAb/view?usp=sharing)
+
+
 # II. Run project
 ## Step 1: Run Metro Server on your terminal
 
@@ -43,8 +50,6 @@ yarn start
 ## Step 2: Start your Application
 
 Let Metro Bundler run in its _own_ terminal. Press **I** to run the application on IOS, **A** to run the application on the Android emulator.
-
-
 
 # III. Navigation
 
